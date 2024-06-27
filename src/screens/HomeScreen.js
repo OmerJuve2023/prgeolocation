@@ -1,30 +1,33 @@
 import React from 'react';
-import { View, Button, StyleSheet, Text, Image } from 'react-native';
+import {View, Button, StyleSheet, Text, Image, TouchableOpacity} from 'react-native';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
     return (
         <View style={styles.container}>
+            <Image
+                source={require('../images/logo.png')}
+                style={styles.imageIcon}
+                resizeMode="contain"
+            />
             <Text style={styles.text}>Bienvenidos a la universidad</Text>
             <Image
-                source={require('../images/unjfsc.png')} // Asegúrate de usar la ruta correcta a tu imagen
+                source={require('../images/unjfsc.png')}
                 style={styles.image}
                 resizeMode="contain"
             />
-            <View>
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title="Buscar Salones"
-                        color="#004672"
-                        onPress={() => navigation.navigate('Search')}
-                    />
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button
-                        title="Ver Mapa"
-                        color="#004672"
-                        onPress={() => navigation.navigate('Map')}
-                    />
-                </View>
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('Search')}
+                >
+                    <Text style={styles.buttonText}>Buscar Salones</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => navigation.navigate('Map')}
+                >
+                    <Text style={styles.buttonText}>Ver Mapa</Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -35,21 +38,52 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: '#f8f8f8',
     },
     buttonContainer: {
         margin: 10,
         width: '80%',
     },
     text: {
-        fontSize: 24,
+        fontSize: 26, // Tamaño del texto más grande
         fontWeight: 'bold',
         marginBottom: 20,
         color: '#004672',
+        fontFamily: 'Custom-Font', // Aplica la fuente personalizada
+        textShadowColor: 'rgba(0, 0, 0, 0.25)', // Sombra del texto
+        textShadowOffset: {width: 2, height: 2},
+        textShadowRadius: 4,
+        textAlign: 'center', // Centra el texto
+        letterSpacing: 1.2, //
     },
     image: {
-        width: '80%', // Ajusta el ancho de la imagen según sea necesario
-        height: 200, // Ajusta la altura de la imagen según sea necesario
-        marginBottom: 20, // Añade un margen inferior si quieres espacio entre la imagen y los botones
+        width: '100%',
+        height: 215,
+        marginBottom: 20,
+    },
+    button: {
+        backgroundColor: '#004672',
+        paddingVertical: 15,
+        paddingHorizontal: 25,
+        borderRadius: 25, // Bordes redondeados
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 5, // Sombra en Android
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        letterSpacing: 1.5,
+    },
+    imageIcon: {
+        width: "50%",
+        height: 100,
     },
 });
 
