@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "prgeolocation",
-    "slug": "prgeolocation",
+    "slug": "geolocation",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,16 +12,29 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We need your location to show your current position on the map."
+      }
     },
     "android": {
+      "package": "com.yourcompany.prgeolocation",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1bb320db-c559-4177-91f2-21f25405f969"
+      }
     }
   }
 }

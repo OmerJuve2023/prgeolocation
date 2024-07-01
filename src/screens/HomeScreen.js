@@ -1,7 +1,37 @@
-import React from 'react';
-import {View, Button, StyleSheet, Text, Image, TouchableOpacity} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import * as Location from 'expo-location';
+import axios from 'axios';
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
+    const [location, setLocation] = useState(null);
+    const [address, setAddress] = useState('');
+    const [errorMsg, setErrorMsg] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+            getAddressFromCoordinates(location.coords.latitude, location.coords.longitude);
+        })();
+    }, []);
+
+    const getAddressFromCoordinates = async (latitude, longitude) => {
+        try {
+            const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const address = response.data.display_name;
+            setAddress(address);
+        } catch (error) {
+            Alert.alert("Error", "No se pudo obtener la dirección");
+        }
+    };
+
     return (
         <View style={styles.container}>
             <Image
@@ -15,6 +45,7 @@ const HomeScreen = ({navigation}) => {
                 style={styles.image}
                 resizeMode="contain"
             />
+            <Text style={styles.locationText}>{address}</Text>
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={styles.button}
@@ -45,16 +76,16 @@ const styles = StyleSheet.create({
         width: '80%',
     },
     text: {
-        fontSize: 26, // Tamaño del texto más grande
+        fontSize: 26,
         fontWeight: 'bold',
         marginBottom: 20,
         color: '#004672',
-        fontFamily: 'Custom-Font', // Aplica la fuente personalizada
-        textShadowColor: 'rgba(0, 0, 0, 0.25)', // Sombra del texto
+        fontFamily: 'Custom-Font',
+        textShadowColor: 'rgba(0, 0, 0, 0.25)',
         textShadowOffset: {width: 2, height: 2},
         textShadowRadius: 4,
-        textAlign: 'center', // Centra el texto
-        letterSpacing: 1.2, //
+        textAlign: 'center',
+        letterSpacing: 1.2,
     },
     image: {
         width: '100%',
@@ -65,13 +96,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#004672',
         paddingVertical: 15,
         paddingHorizontal: 25,
-        borderRadius: 25, // Bordes redondeados
+        borderRadius: 25,
         marginBottom: 15,
         shadowColor: '#000',
         shadowOffset: {width: 0, height: 2},
         shadowOpacity: 0.3,
         shadowRadius: 4,
-        elevation: 5, // Sombra en Android
+        elevation: 5,
         alignItems: 'center',
     },
     buttonText: {
@@ -84,6 +115,11 @@ const styles = StyleSheet.create({
     imageIcon: {
         width: "50%",
         height: 100,
+    },
+    locationText: {
+        fontSize: 18,
+        color: '#333',
+        marginVertical: 10,
     },
 });
 
