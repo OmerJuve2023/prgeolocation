@@ -1,108 +1,48 @@
-/*import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import Header from '../components/Header';
-
-const MapScreen = () => {
-    return (
-        <View style={styles.container}>
-            <Header title="Mapa del Campus" />
-            <View style={styles.content}>
-                <Text style={styles.title}>Aquí se mostrará el mapa del campus</Text>
-                {/!* Aquí iría el componente del mapa *!/}
-            </View>
-        </View>
-    );
-};
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-    },
-    title: {
-        fontSize: 24,
-        marginBottom: 20,
-    },
-});
-
-export default MapScreen;*/
-// MapScreen.js
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, PermissionsAndroid, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Dimensions, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import Geolocation from 'react-native-geolocation-service';
+import * as Location from 'expo-location';
 
 const MapScreen = () => {
+    const [location, setLocation] = useState(null);
     const [region, setRegion] = useState({
-        latitude: -12.04318, // Coordenadas de la Universidad
-        longitude: -77.02824,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitude: 37.78825,
+        longitude: -122.4324,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
     });
 
-    const [currentPosition, setCurrentPosition] = useState(null);
-
-    const hasLocationPermission = async () => {
-        if (Platform.OS === 'ios') {
-            return true;
-        }
-
-        const granted = await PermissionsAndroid.request(
-            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-            {
-                title: 'Location Permission',
-                message: 'This app needs access to your location to show your position on the map.',
-                buttonNeutral: 'Ask Me Later',
-                buttonNegative: 'Cancel',
-                buttonPositive: 'OK',
-            },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-    };
-
-    const getLocation = async () => {
-        const hasPermission = await hasLocationPermission();
-        if (!hasPermission) {
-            return;
-        }
-
-        Geolocation.getCurrentPosition(
-            (position) => {
-                setCurrentPosition({
-                    latitude: position.coords.latitude,
-                    longitude: position.coords.longitude,
-                });
-            },
-            (error) => {
-                console.log(error.message);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 10000,
-            },
-        );
-    };
-
     useEffect(() => {
-        getLocation().then(r => r);
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permisos denegados', 'Permiso para acceder a la ubicación fue denegado.');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+            setRegion({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            });
+        })();
     }, []);
 
     return (
         <View style={styles.container}>
-            <MapView
-                style={styles.map}
-                region={region}
-                onRegionChangeComplete={(region) => setRegion(region)}
-            >
-                <Marker coordinate={{ latitude: -12.04318, longitude: -77.02824 }} title="Universidad Nacional José Faustino Sánchez Carrión" />
-                {currentPosition && (
-                    <Marker coordinate={currentPosition} title="Tu ubicación actual" pinColor="blue" />
+            <MapView style={styles.map} region={region}>
+                {location && (
+                    <Marker
+                        coordinate={{
+                            latitude: location.coords.latitude,
+                            longitude: location.coords.longitude,
+                        }}
+                        title="Tu ubicación"
+                        description="Esta es tu ubicación actual"
+                    />
                 )}
             </MapView>
         </View>
@@ -112,9 +52,12 @@ const MapScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     map: {
-        ...StyleSheet.absoluteFillObject,
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
     },
 });
 

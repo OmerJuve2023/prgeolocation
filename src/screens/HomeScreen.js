@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Text, StyleSheet, Image, TouchableOpacity, Alert} from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
     const [location, setLocation] = useState(null);
     const [address, setAddress] = useState('');
     const [errorMsg, setErrorMsg] = useState(null);
 
     useEffect(() => {
         (async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
+            let {status} = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 setErrorMsg('Permission to access location was denied');
                 return;
@@ -18,13 +18,14 @@ const HomeScreen = ({ navigation }) => {
 
             let location = await Location.getCurrentPositionAsync({});
             setLocation(location);
-            getAddressFromCoordinates(location.coords.latitude, location.coords.longitude);
+            getAddressFromCoordinates(location.coords.latitude, location.coords.longitude).then(r => r);
         })();
     }, []);
 
     const getAddressFromCoordinates = async (latitude, longitude) => {
         try {
-            const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            const response = await axios.get(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
             const address = response.data.display_name;
             setAddress(address);
         } catch (error) {
